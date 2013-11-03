@@ -1,0 +1,24 @@
+<hr/>
+<h4>History</h4>
+{% if service.history.count > 0 %}
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Status</th>
+				<th>Response</th>
+				<th>Time</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for history in service.history.all %}
+			<tr>
+				<td>{% if history.is_up %} Up {% else %} Down {% endif %}</td>
+				<td>{{ history.response }}</td>
+				<td>{{ history.created_on }}</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+{% else %}
+	<p>no history available</p>
+{% endif %}
