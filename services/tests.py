@@ -23,9 +23,15 @@ def standard_view_assertions(self, response):
 
 def login(self):
 	from django.contrib.auth.models import User
-	user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+	user = None
+	user_name = 'john'
+	user_password = 'johnpassword'
+	try:
+		user = User.objects.get(pk = 1)
+	except Exception, e:
+		user = User.objects.create_user(user_name, 'lennon@thebeatles.com', user_password)
 	user.save()
-	self.client.login(username='john', password='johnpassword')
+	self.client.login(username=user_name, password=user_password)
 
 class ServiceHistoryModelTests(TestCase):
 	def test_service_history_defaults(self):
@@ -64,9 +70,13 @@ class ServiceModelTests(TestCase):
 		self.assertEqual(s.get_absolute_url(), reverse('services:detail', args=(s.pk,)))
 
 class ServiceViewTests(TestCase):
+
+	def setUp(self):
+		login(self)
+
 	def test_index_with_no_services (self):
 		response = self.client.get(reverse('services:index'))
-		self.assertEqual(response.status_code, 200)
+		standard_view_assertions(self, response)
 		self.assertContains(response, 'no services')
 		self.assertQuerysetEqual(response.context['services'], [])
 
@@ -76,7 +86,6 @@ class ServiceViewTests(TestCase):
 		self.assertEqual(response.content, '[]')
 
 	def test_detail_view (self):
-		login(self)
 		s = ServiceModel(name = 'detailviewtest', service_group=create_group())
 		s.save()
 		response = self.client.get(reverse('services:detail', args=(s.pk,)))
@@ -84,7 +93,6 @@ class ServiceViewTests(TestCase):
 		self.assertContains(response, 'detailviewtest')
 
 	def test_detail_view_json(self):
-		login(self)
 		s = create_service()
 		jsonModelOriginal = serializers.serialize('json', [s])
 		response = self.client.get(create_json_url(reverse('services:detail', args=(s.pk,))))
@@ -92,30 +100,26 @@ class ServiceViewTests(TestCase):
 		self.assertEqual(jsonModelOriginal, response.content)
 
 	def test_detail_with_no_history_view (self):
-		login(self)
 		s = ServiceModel(name = 'detailviewtest', service_group=create_group())
 		s.save()
 		response = self.client.get(reverse('services:detail', args=(s.pk,)))
-		self.assertEqual(response.status_code, 200)
+		standard_view_assertions(self, response)
 		self.assertContains(response, 'detailviewtest')
 		self.assertContains(response, 'no history available')
 
 	def test_detail_with_history_view (self):
-		login(self)
 		s = ServiceModel(name = 'detailviewtest', service_group=create_group())
 		s.ping(force_ping = True)
 		response = self.client.get(reverse('services:detail', args=(s.pk,)))
-		self.assertEqual(response.status_code, 200)
+		standard_view_assertions(self, response)
 		self.assertContains(response, 'detailviewtest')
 		self.assertContains(response, 'Time')
 
 	def test_form_view(self):
-		login(self)
 		response = self.client.get(reverse('services:add'))
-		self.assertEqual(response.status_code, 200)
+		standard_view_assertions(self, response)
 
 	def test_json_add(self):
-		login(self)
 		create_group()
 		response = self.client.post(reverse('services:json_add'),
 			content_type='application/json', 
@@ -136,18 +140,16 @@ class ServiceViewTests(TestCase):
 		self.assertEqual(json_response['fields']['name'], 'test')
 
 	def test_ping_view(self):
-		login(self)
 		s = create_service()
 		response = self.client.get(reverse('services:ping', args=(s.pk,)), follow=True) #redirects to index page
-		self.assertEqual(response.status_code, 200)
+		standard_view_assertions(self, response)
 		self.assertContains(response, s.name)
 
 	def test_delete_view(self):
-		login(self)
 		s1 = create_service()
 		s2 = create_service()
 		response = self.client.delete(reverse('services:delete', args=(s2.pk,)), follow=True)
-		self.assertEqual(response.status_code, 200)
+		standard_view_assertions(self, response)
 		try:
 			ServiceModel.objects.get(id=s2.pk)
 		except Exception, e:
@@ -161,15 +163,19 @@ class ServiceGroupModelTests(TestCase):
 		self.assertEqual(g.get_absolute_url(), reverse('services:index'))
 
 class ServiceGroupViewTests(TestCase):
+
+	def setUp(self):
+		login(self)
+
 	def test_form_view(self):
 		response = self.client.get(reverse('services:group_add'))
-		self.assertEqual(response.status_code, 200)
+		standard_view_assertions(self, response)
 
 	def test_detail_view(self):
 		s = create_service()
 		group = s.service_group
 		response = self.client.get(reverse('services:group_detail', args=(group.pk,)))
-		self.assertEqual(response.status_code, 200)
+		standard_view_assertions(self, response)
 		self.assertContains(response, s.name)
 		self.assertContains(response, group.name)
 
@@ -198,7 +204,7 @@ class ServiceGroupViewTests(TestCase):
 		g1 = create_group()
 		g2 = create_group()
 		response = self.client.delete(reverse('services:group_delete', args=(g2.pk,)), follow = True)
-		self.assertEqual(response.status_code, 200)
+		standard_view_assertions(self, response)
 		self.assertEqual(ServiceGroupModel.objects.get(id=g1.pk).pk, g1.pk)
 		try:
 			ServiceGroupModel.objects.get(id=g2.pk)
