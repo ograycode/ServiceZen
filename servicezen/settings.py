@@ -120,6 +120,14 @@ LOGIN_URL = (
     '/auth/login/'
 )
 
+LOGIN_REDIRECT_URL = (
+    '/'
+)
+
+LOGOUT_URL = (
+    '/auth/logout/'
+)
+
 ROOT_URLCONF = 'servicezen.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
