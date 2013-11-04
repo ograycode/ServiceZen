@@ -4,13 +4,19 @@ Manage your SOA automatically.
 
 ## About
 
-Servicezen allows you to easily manage and monitor the discovery of your services for your SOA Application. It is based upon standard HTTP protocols, and gives you a simple user interface to add, delete, and monitor groups of services. 
+ServiceZen allows you to easily manage and monitor the discovery of the services that make up your SOA application. It is based upon standard HTTP protocols, and gives you a simple user interface and api to add, delete, and monitor groups of services. 
+
+The aim of this project is to provide the simplest practical way to manage the services that are needed for an SOA application in any environment.
 
 ## Usage
 
-Once installed and configured, the only command you need to worry about is setting up some sort of scheduled task to execute the command ``python manage.py pingservices``, which will check the status of all services that have refresh enabled. You can force a check of every service by using ``python manage.py pingservices forceping``.
+Once installed and configured, the only command you need to worry about is setting up some sort of scheduled task to execute ``python manage.py pingservices``, which will check the status of all services that have refresh enabled. You can force a check of every service by using ``python manage.py pingservices forceping``.
 
 A service that is up should always return with an http status code of ``200 OK``.
+
+### Workflow
+
+To use this application, each of your services should register with your ServiceZen installation(s) and query the server for the services that are applicable to it. When a service fails to respond adequately, the next active service in the list should be used. The clients can force an update of a give service through the api, as well get an update set of services at any time. At this time, there are no client libraries for this project, but the api is simple enough that it shouldn't be a burden to write them in whatever language you need. Once written, feel free to send a pull request to add your client library to the list.
 
 ## API
 
@@ -42,12 +48,12 @@ Users can be created through the adminstration panel at ``/admin`` and the API u
 
 **POST/PUT**
 
-*   ``/service/add.json`` will create a new service
-*   ``/service/[primary_key]/edit.json`` will edit an existing service
+*   ``/service/add.json`` creates a new service
+*   ``/service/[primary_key]/edit.json`` edits an existing service
 
 **DELETE**
 
-*   ``/service/[primary_key]/delete`` will delete an existing service
+*   ``/service/[primary_key]/delete`` deletes an existing service
 
 ### Service Groups
 
@@ -70,7 +76,7 @@ Users can be created through the adminstration panel at ``/admin`` and the API u
 *   django-tokenapi
 
 ## Setup
-Ensure that Pip, Django 1.5 and Python 2.7 are installed before proceeding. The following is targeted at Ubuntu based distributions, but should run work on a variety of platforms.
+Ensure that Pip, Django 1.5 and Python 2.7 are installed before proceeding. The following is targeted at Ubuntu based distributions, but should run on a variety of platforms.
 
 1. ``pip install django-bootstrap3``
 2. ``pip install django-tokenapi``
@@ -92,8 +98,12 @@ The default admin user/password is servicezen_admin/admin_servicezen
 
 Written using Django 1.5 and Python 2.7, it is very easy to extend. In fact there are only three models that make up the core functionality of the application. 
 
-By default, the application uses SQLite, but the database can be switched out by changing a configuration file.
+By default, the application uses SQLite, but the database can be switched out by changing servicezen/settings.py
 
 ## TODO
 
 Increase test coverage and documentation
+
+## License
+
+This project is licensed under the MIT license, a copy of which can be found in the LICENSE file.
