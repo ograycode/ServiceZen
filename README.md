@@ -79,6 +79,15 @@ Ensure that Pip, Django 1.5 and Python 2.7 are installed before proceeding. The 
 5. ``python manage.py syncdb``
 6. ``python manage.py runserver``
 
+### Demo
+If you have [Docker](http://www.docker.io) installed, there is already a repo which can be used as a demo.
+
+1. ``sudo docker pull ograycode/service-zen``
+1. ``sudo docker run -d -p 8000 ograycode/service-zen python /ServiceZen/manage.py runserver 0.0.0.0:8000``
+2. ``sudo docker ps`` to find the port that docker connected to.
+
+The default admin user/password is servicezen_admin/admin_servicezen
+
 ## Easy to Extend
 
 Written using Django 1.5 and Python 2.7, it is very easy to extend. In fact there are only three models that make up the core functionality of the application. 
