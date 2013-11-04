@@ -109,6 +109,7 @@ AUTHENTICATION_BACKENDS = (
 
 LOGIN_REQUIRED_URLS = (
     r'^/service/(.*)/$',
+    r'^/group/(.*)/$',
 )
 
 LOGIN_REQUIRED_URLS_EXCEPTIONS = (

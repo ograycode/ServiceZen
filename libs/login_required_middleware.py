@@ -46,14 +46,6 @@ class RequireLoginMiddleware(object):
 			if url.match(request.path):
 				user = None
 				token = None
-				basic_auth = request.META.get('HTTP_AUTHORIZATION')
-
-				if basic_auth:
-					auth_method, auth_string = basic_auth.split(' ', 1)
-
-					if auth_method.lower() == 'basic':
-						auth_string = auth_string.strip().decode('base64')
-						user, token = auth_string.split(':', 1)
 
 				if not (user and token):
 					try:
@@ -61,14 +53,15 @@ class RequireLoginMiddleware(object):
 						user = json_request['user']
 						token = json_request['token']
 					except Exception, e:
-						print('Exception: ' + e.tostring)
+						return login_required(view_func)(request, *view_args, **view_kwargs)
 
 				if user and token:
 					user = authenticate(pk=user, token=token)
 					if user:
 						login(request, user)
-						print('about to go in')
 						return None
+					else: 
+						return login_required(view_func)(request, *view_args, **view_kwargs)
 				else:
 					return login_required(view_func)(request, *view_args, **view_kwargs)
 
