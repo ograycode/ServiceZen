@@ -48,12 +48,16 @@ class RequireLoginMiddleware(object):
 				token = None
 
 				if not (user and token):
-					try:
-						json_request = json.loads(request.body)
-						user = json_request['user']
-						token = json_request['token']
-					except Exception, e:
-						return login_required(view_func)(request, *view_args, **view_kwargs)
+					if request.method == 'GET':
+						user = request.GET.get('user')
+						token = request.GET.get('token')
+					else:
+						try:
+							json_request = json.loads(request.body)
+							user = json_request['user']
+							token = json_request['token']
+						except Exception, e:
+							return login_required(view_func)(request, *view_args, **view_kwargs)
 
 				if user and token:
 					user = authenticate(pk=user, token=token)

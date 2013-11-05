@@ -21,16 +21,20 @@ def create_json_url(url):
 def standard_view_assertions(self, response):
 	self.assertEqual(response.status_code, 200)
 
-def login(self):
+def create_user(user_name='john', user_password='johnpassword', email='lennon@thebeatles.com'):
 	from django.contrib.auth.models import User
 	user = None
-	user_name = 'john'
-	user_password = 'johnpassword'
 	try:
 		user = User.objects.get(pk = 1)
 	except Exception, e:
-		user = User.objects.create_user(user_name, 'lennon@thebeatles.com', user_password)
+		user = User.objects.create_user(user_name, email, user_password)
 	user.save()
+	return user
+
+def login(self):
+	user_name = 'john'
+	user_password = 'johnpassword'
+	user = create_user(user_name=user_name, user_password=user_password)
 	self.client.login(username=user_name, password=user_password)
 
 class ServiceHistoryModelTests(TestCase):
@@ -80,24 +84,12 @@ class ServiceViewTests(TestCase):
 		self.assertContains(response, 'no services')
 		self.assertQuerysetEqual(response.context['services'], [])
 
-	def test_index_with_no_services_json(self):
-		response = self.client.get(create_json_url(reverse('services:index')))
-		standard_view_assertions(self, response)
-		self.assertEqual(response.content, '[]')
-
 	def test_detail_view (self):
 		s = ServiceModel(name = 'detailviewtest', service_group=create_group())
 		s.save()
 		response = self.client.get(reverse('services:detail', args=(s.pk,)))
 		standard_view_assertions(self, response)
 		self.assertContains(response, 'detailviewtest')
-
-	def test_detail_view_json(self):
-		s = create_service()
-		jsonModelOriginal = serializers.serialize('json', [s])
-		response = self.client.get(create_json_url(reverse('services:detail', args=(s.pk,))))
-		standard_view_assertions(self, response)
-		self.assertEqual(jsonModelOriginal, response.content)
 
 	def test_detail_with_no_history_view (self):
 		s = ServiceModel(name = 'detailviewtest', service_group=create_group())
@@ -119,26 +111,6 @@ class ServiceViewTests(TestCase):
 		response = self.client.get(reverse('services:add'))
 		standard_view_assertions(self, response)
 
-	def test_json_add(self):
-		create_group()
-		response = self.client.post(reverse('services:json_add'),
-			content_type='application/json', 
-			data='{"fields":{"name":"test", "service_group": 1}}')
-		standard_view_assertions(self, response)
-		json_response = json.loads(response.content)[0]
-		self.assertEqual(json_response['pk'],1)
-		self.assertEqual(json_response['fields']['name'], 'test')
-		self.assertEqual(json_response['fields']['service_group'], 1)
-
-	def test_json_edit(self):
-		s = create_service()
-		response = self.client.post(reverse('services:json_edit', args=(s.pk,)),
-			content_type='application/json',
-			data='{"fields":{"name":"test"}}')
-		standard_view_assertions(self, response)
-		json_response = json.loads(response.content)[0]
-		self.assertEqual(json_response['fields']['name'], 'test')
-
 	def test_ping_view(self):
 		s = create_service()
 		response = self.client.get(reverse('services:ping', args=(s.pk,)), follow=True) #redirects to index page
@@ -156,6 +128,64 @@ class ServiceViewTests(TestCase):
 			pass
 		else: # pragma: no cover
 			self.assertEqual(True, False) #if hit, service model was found, so fail the test
+
+class ServiceJsonViewTests(TestCase):
+	user = None
+	token = None 
+
+	def append_login_info(self, json_data):
+		json_data = json.loads(json_data)
+		json_data['user'] = self.user
+		json_data['token'] = self.token
+		return json.dumps(json_data)
+
+	def setUp(self):
+		if not(self.user and self.token):
+			user_name = 'john'
+			user_password = 'johnpassword'
+			user = create_user(user_name=user_name, user_password=user_password)
+			response = self.client.post('/token/new.json',
+			content_type='application/x-www-form-urlencoded',
+			data='username=' + user_name + '&password=' + user_password)
+			json_response = json.loads(response.content)
+			self.user = json_response['user']
+			self.token = json_response['token']
+
+	def test_index_with_no_services_json(self):
+		response = self.client.get(create_json_url(reverse('services:index')))
+		standard_view_assertions(self, response)
+		self.assertEqual(response.content, '[]')
+
+	def test_detail_view_json(self):
+		s = create_service()
+		url = create_json_url(reverse('services:detail', args=(s.pk,))) + '&user=' + str(self.user) + '&token=' + self.token
+		response = self.client.get(url)
+		jsonModelOriginal = serializers.serialize('json', [s])
+		standard_view_assertions(self, response)
+		self.assertEqual(jsonModelOriginal, response.content)
+
+	def test_json_add(self):
+		create_group()
+		data = self.append_login_info('{"fields":{"name":"test", "service_group": 1}}')
+		response = self.client.post(reverse('services:json_add'),
+			content_type='application/json', 
+			data=data)
+		standard_view_assertions(self, response)
+		json_response = json.loads(response.content)[0]
+		self.assertEqual(json_response['pk'],1)
+		self.assertEqual(json_response['fields']['name'], 'test')
+		self.assertEqual(json_response['fields']['service_group'], 1)
+
+	def test_json_edit(self):
+		s = create_service()
+		data = self.append_login_info('{"fields":{"name":"test"}}')
+		response = self.client.post(reverse('services:json_edit', args=(s.pk,)),
+			content_type='application/json',
+			data=data)
+		standard_view_assertions(self, response)
+		json_response = json.loads(response.content)[0]
+		self.assertEqual(json_response['fields']['name'], 'test')
+
 
 class ServiceGroupModelTests(TestCase):
 	def test_get_absolute_url(self):
