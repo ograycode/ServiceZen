@@ -69,6 +69,13 @@ class ServiceGroupFormViewBase(ServiceGroupViewBase):
 	""" The base for ServiceGroupModel's AddView and EditView """
 	template_name = 'service_groups/form.html'
 
+class ServiceGroupList(HybridListView):
+	template_name = 'service_groups/list.html'
+	context_object_name = 'service_groups'
+
+	def get_queryset(self):
+		return ServiceGroupModel.objects.all()
+
 class ServiceGroupAdd(ServiceGroupFormViewBase, generic.edit.CreateView):
 	""" The new form view for ServiceGroupModel """
 	pass

@@ -19,6 +19,8 @@ urlpatterns = patterns('',
 	#/service/4/delete
 	url(r'^service/(?P<pk>\d+)/delete/$', views.ServiceDelete.as_view(), name='delete'),
 	#/group/add
+	url(r'^group/all/$', views.ServiceGroupList.as_view(), name='group_list'),
+	#/group/add
 	url(r'^group/add/$', views.ServiceGroupAdd.as_view(), name='group_add'),
 	#/group/add/format=json
 	url(r'^group/add.json$', views.ServiceGroupJsonAddOrEdit.as_view(), name='group_json_add'),

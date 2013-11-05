@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from services.models import ServiceModel, ServiceGroupModel, ServiceHistoryModel
 
+#Helper methods
 def create_group(name = 'group1'):
 	group = ServiceGroupModel(name=name)
 	group.save()
@@ -196,6 +197,20 @@ class ServiceGroupViewTests(TestCase):
 
 	def setUp(self):
 		login(self)
+
+	def test_list_view(self):
+		s = create_service()
+		g = s.service_group
+		response = self.client.get(reverse('services:group_list'))
+		standard_view_assertions(self, response)
+		self.assertContains(response, g.name)
+
+	def test_json_list_view(self):
+		s = create_service()
+		g = s.service_group
+		response = self.client.get(create_json_url(reverse('services:group_list')))
+		standard_view_assertions(self, response)
+		self.assertContains(response, '"fields": {"name": "'+g.name+'"}')
 
 	def test_form_view(self):
 		response = self.client.get(reverse('services:group_add'))
