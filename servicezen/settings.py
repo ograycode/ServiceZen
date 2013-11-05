@@ -155,6 +155,7 @@ INSTALLED_APPS = (
     'bootstrap3',
     'services',
     'accounts',
+    'libs',
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'

@@ -44,20 +44,9 @@ class RequireLoginMiddleware(object):
 		# wrapped with the login_required decorator
 		for url in self.required:
 			if url.match(request.path):
-				user = None
-				token = None
-
-				if not (user and token):
-					if request.method == 'GET':
-						user = request.GET.get('user')
-						token = request.GET.get('token')
-					else:
-						try:
-							json_request = json.loads(request.body)
-							user = json_request['user']
-							token = json_request['token']
-						except Exception, e:
-							return login_required(view_func)(request, *view_args, **view_kwargs)
+				user_token_tuple = self._get_api_user_and_token(request)
+				user = user_token_tuple[0]
+				token = user_token_tuple[1]
 
 				if user and token:
 					user = authenticate(pk=user, token=token)
@@ -71,3 +60,20 @@ class RequireLoginMiddleware(object):
 
 		# Explicitly return None for all non-matching requests
 		return None
+
+	def _get_api_user_and_token(self, request):
+		user = None
+		token = None
+
+		if request.method == 'GET':
+			user = request.GET.get('user')
+			token = request.GET.get('token')
+		else:
+			try:
+				json_params = json.loads(request.body)
+				user = json_params['user']
+				token = json_params['token']
+			except Exception, e:
+				pass
+				
+		return user, token
