@@ -10,6 +10,6 @@ from django.core.urlresolvers import reverse
 
 
 class TestAuthViews(TestCase):
-	def test_login_page_load(self):
-		response = self.client.get(reverse('accounts:login'))
-		self.assertEqual(response.status_code, 200)
+    def test_login_page_load(self):
+        response = self.client.get(reverse('accounts:login'))
+        self.assertEqual(response.status_code, 200)
