@@ -1,7 +1,6 @@
 import json
 from django.test import TestCase
 from django.core import serializers
-from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from services.models import ServiceModel, ServiceGroupModel, ServiceHistoryModel
 
