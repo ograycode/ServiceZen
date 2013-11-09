@@ -42,7 +42,7 @@ Users can be created through the administration panel at ``/admin`` and the API 
 
     http://localhost:8000/service/1/?format=json&user=1&token=3mf-31c934a763deae02a7b2
 
-    
+    [{"pk": 1, "model": "services.servicemodel", "fields": {"service_group": 1, "name": "service1", "url": "", "health_url": "", "created_on": "2013-11-09T18:38:53Z", "is_up": false, "is_refresh_on": false}}]
 
 ### Services
 
