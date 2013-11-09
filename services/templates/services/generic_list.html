@@ -1,33 +1,34 @@
 {% if services %}
-<table class="table table-striped">
-	<thead>
-		<tr>
-			<th>Name</th>
-			<th>Status</th>
-			<th>Last Pinged</th>
-			<th>Group</th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-	{% for service in services %}
-		<tr>
-			<td>
-				<a href="{% url 'services:detail' service.id %}">
-					{{ service.name }}
-				</a>
-			</td>
-			<td> {% if service.is_up %} Up {% else %} Down {% endif %} </td>
-			<td> {{ service.history.latest.created_on }} </td>
-			<td> <a href="{% url 'services:group_detail' service.service_group.pk %}">{{ service.service_group }}</a> </td>
-			<td> 
-				<a href="{% url 'services:edit' service.id %}">Edit</a>
-				 | <a href="{% url 'services:ping' service.id %}">Ping</a>
-			</td>
-		</tr>
-	{% endfor %}
-	</tbody>
-</table>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Last Pinged</th>
+            <th>Group</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for service in services %}
+            <tr>
+                <td>
+                    <a href="{% url 'services:detail' service.id %}">
+                        {{ service.name }}
+                    </a>
+                </td>
+                <td> {% if service.is_up %} Up {% else %} Down {% endif %} </td>
+                <td> {{ service.history.latest.created_on }} </td>
+                <td><a href="{% url 'services:group_detail' service.service_group.pk %}">{{ service.service_group }}</a>
+                </td>
+                <td>
+                    <a href="{% url 'services:edit' service.id %}">Edit</a>
+                    | <a href="{% url 'services:ping' service.id %}">Ping</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% else %}
-	<p> no services </p>
+    <p> no services </p>
 {% endif %}

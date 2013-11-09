@@ -1,26 +1,27 @@
 {% extends "site/base_template.html" %}
 
 {% block content %}
-	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-				<h3>{{ service.name }}</h3>
-				<div> 
-					in 
-					<a href="{% url 'services:group_detail' service.service_group.pk %}">
-						{{ service.service_group.name }}
-					</a>
-					 is {% if service.is_up %} Up {% else %} Down {% endif %}
-				</div>
-				<a href="{% url 'services:ping' service.pk %}" class="btn btn-success">Ping Service</a>
-				<a href="{% url 'services:edit' service.pk %}" class="btn btn-primary">Edit Service</a>
-				<a href="{% url 'services:delete' service.pk %}" class="btn btn-danger">Delete Service</a>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12">
-				{% include 'service_history/list.html' %}
-			</div>
-		</div>
-	</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>{{ service.name }}</h3>
+
+                <div>
+                    in
+                    <a href="{% url 'services:group_detail' service.service_group.pk %}">
+                        {{ service.service_group.name }}
+                    </a>
+                    is {% if service.is_up %} Up {% else %} Down {% endif %}
+                </div>
+                <a href="{% url 'services:ping' service.pk %}" class="btn btn-success">Ping Service</a>
+                <a href="{% url 'services:edit' service.pk %}" class="btn btn-primary">Edit Service</a>
+                <a href="{% url 'services:delete' service.pk %}" class="btn btn-danger">Delete Service</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                {% include 'service_history/list.html' %}
+            </div>
+        </div>
+    </div>
 {% endblock %}

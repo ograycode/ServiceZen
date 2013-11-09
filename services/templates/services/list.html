@@ -1,13 +1,13 @@
 {% extends "site/base_template.html" %}
 
 {% block content %}
-	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-				<a href="{% url 'services:add' %}" class="btn btn-default">Add Service</a>
-				<a href="{% url 'services:group_add' %}" class="btn btn-default">Add Service Group</a>
-			</div>
-		</div>
-		{% include 'services/generic_list.html' %}
-	</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <a href="{% url 'services:add' %}" class="btn btn-default">Add Service</a>
+                <a href="{% url 'services:group_add' %}" class="btn btn-default">Add Service Group</a>
+            </div>
+        </div>
+        {% include 'services/generic_list.html' %}
+    </div>
 {% endblock %}
