@@ -24,7 +24,7 @@ In general, by adding ``?format=json`` to each url, a json formatted view will b
 
 ### Authentication
 
-Users can be created through the adminstration panel at ``/admin`` and the API uses a token based authentication scheme. The following is an example of creating a new service using the token based authentication.
+Users can be created through the administration panel at ``/admin`` and the API uses a token based authentication scheme. The following is an example of creating a new service using the token based authentication.
 
     curl -X POST -d "username=user_name&password=secret_password" http://localhost:8000/token/new.json
 
@@ -37,6 +37,12 @@ Users can be created through the adminstration panel at ``/admin`` and the API u
     curl -X POST -d "{\"fields\": {\"name\":\"service_one\", \"service_group\": 4}, \"user\":2, \"token\":\"3m9-273d1cdc7d5863d509b3\"}" http://localhost:8000/service/add.json
 
     [{"pk": 2, "model": "services.servicemodel", "fields": {"service_group": 4, "name": "service_one", "url": null, "health_url": null, "created_on": "2013-11-03T23:18:33.347Z", "is_up": false, "is_refresh_on": false}}]
+
+``GET`` requests are slightly different, so here is an example:
+
+    http://localhost:8000/service/1/?format=json&user=1&token=3mf-31c934a763deae02a7b2
+
+    
 
 ### Services
 
